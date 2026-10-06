@@ -1,0 +1,110 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: macos-14
+            target: darwin-arm64
+          - os: macos-13
+            target: darwin-x64
+          - os: ubuntu-22.04
+            target: linux-x64
+          - os: windows-2022
+            target: windows-x64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          pip install -e .
+
+      - name: Build binary (Unix)
+        if: matrix.os != 'windows-2022'
+        shell: bash
+        run: |
+          chmod +x packaging/build.sh scripts/smoke_test.sh
+          ./packaging/build.sh ${{ matrix.target }}
+
+      - name: Build binary (Windows)
+        if: matrix.os == 'windows-2022'
+        shell: pwsh
+        run: |
+          .\packaging\build.ps1 -Target ${{ matrix.target }}
+
+      # The build scripts already ran scripts/smoke_test.sh against the raw
+      # binary; this second pass re-checks the packaged archive extracts and
+      # runs, so broken tarballs/zips never reach the release.
+      - name: Verify packaged artifact (Unix)
+        if: matrix.os != 'windows-2022'
+        shell: bash
+        run: |
+          cd dist
+          f="codecompass-${{ matrix.target }}.tar.gz"
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum -c "$f.sha256"
+          else
+            shasum -a 256 -c "$f.sha256"
+          fi
+          mkdir -p verify && tar -xzf "$f" -C verify
+          ./verify/codecompass --version
+
+      - name: Verify packaged artifact (Windows)
+        if: matrix.os == 'windows-2022'
+        shell: pwsh
+        run: |
+          cd dist
+          $f = "codecompass-${{ matrix.target }}.zip"
+          $expected = ((Get-Content "$f.sha256") -split '\s+')[0]
+          $actual = (Get-FileHash $f -Algorithm SHA256).Hash.ToLower()
+          if ($expected -ne $actual) { throw "Checksum mismatch for $f" }
+          New-Item -ItemType Directory -Path verify | Out-Null
+          Expand-Archive -Path $f -DestinationPath verify
+          .\verify\codecompass.exe --version
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: codecompass-${{ matrix.target }}
+          path: dist/*
+
+  release:
+    needs: build
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Flatten artifacts
+        run: |
+          mkdir -p release
+          find artifacts -type f -exec cp {} release/ \;
+          ls -la release/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          generate_release_notes: true

@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+venv/
+.venv/
+env/
+ENV/
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.tox/
+
+# CodeCompass specific
+~/.codecompass/
+*.db
+*.sqlite
+chroma_db/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+
+# VS Code extension build outputs
+vscode-extension/node_modules/
+vscode-extension/out/
+vscode-extension/media/vendor/
+*.vsix
+
+# OS
+Thumbs.db

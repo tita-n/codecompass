@@ -1,0 +1,9 @@
+Package: codecompass
+Version: 0.0.1
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: CodeCompass Team <team@codecompass.dev>
+Description: AI-powered codebase intelligence layer
+ CodeCompass builds a persistent semantic graph of your codebase
+ and exposes it via CLI, VS Code extension, and MCP for AI agents.

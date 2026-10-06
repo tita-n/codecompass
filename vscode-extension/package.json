@@ -1,0 +1,180 @@
+{
+  "name": "codecompass",
+  "displayName": "CodeCompass",
+  "description": "AI-powered codebase intelligence: ask questions, trace symbols and see impact without leaving VS Code.",
+  "version": "0.0.1",
+  "publisher": "codecompass",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codecompass/codecompass"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Machine Learning",
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "chat",
+    "code graph",
+    "call hierarchy",
+    "code intelligence"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codecompass.index",
+        "title": "Index Workspace",
+        "category": "CodeCompass",
+        "icon": "$(database)"
+      },
+      {
+        "command": "codecompass.query",
+        "title": "Ask a Question",
+        "category": "CodeCompass",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "codecompass.explainSelection",
+        "title": "Explain Code",
+        "category": "CodeCompass"
+      },
+      {
+        "command": "codecompass.simplify",
+        "title": "Suggest Simplification",
+        "category": "CodeCompass"
+      },
+      {
+        "command": "codecompass.findCallers",
+        "title": "Find Callers",
+        "category": "CodeCompass",
+        "icon": "$(call-outgoing)"
+      },
+      {
+        "command": "codecompass.findCallees",
+        "title": "Find Callees",
+        "category": "CodeCompass",
+        "icon": "$(call-incoming)"
+      },
+      {
+        "command": "codecompass.showDependencies",
+        "title": "Show Dependencies",
+        "category": "CodeCompass",
+        "icon": "$(type-hierarchy)"
+      },
+      {
+        "command": "codecompass.impactAnalysis",
+        "title": "Impact Analysis",
+        "category": "CodeCompass",
+        "icon": "$(pulse)"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "codecompass.explainSelection",
+          "group": "codecompass@1"
+        },
+        {
+          "command": "codecompass.findCallers",
+          "group": "codecompass@2"
+        },
+        {
+          "command": "codecompass.showDependencies",
+          "group": "codecompass@3"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "codecompass",
+          "title": "CodeCompass",
+          "icon": "media/compass.svg"
+        }
+      ]
+    },
+    "views": {
+      "codecompass": [
+        {
+          "type": "webview",
+          "id": "codecompass.chat",
+          "name": "Chat"
+        },
+        {
+          "type": "webview",
+          "id": "codecompass.graph",
+          "name": "Graph"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "CodeCompass",
+      "properties": {
+        "codecompass.pythonPath": {
+          "type": "string",
+          "default": "python3",
+          "description": "Python interpreter that has the codecompass package installed (used to spawn the local daemon)."
+        },
+        "codecompass.autoIndex": {
+          "type": "boolean",
+          "default": false,
+          "description": "Index the workspace automatically on startup when it has never been indexed."
+        },
+        "codecompass.showCodeLens": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show an 'N callers' CodeLens above function and method definitions."
+        },
+        "codecompass.llmProvider": {
+          "type": "string",
+          "enum": [
+            "anthropic",
+            "openai",
+            "google",
+            "ollama",
+            "none"
+          ],
+          "default": "ollama",
+          "enumDescriptions": [
+            "Anthropic Claude (requires an API key)",
+            "OpenAI (requires an API key)",
+            "Google Gemini (requires an API key)",
+            "Local Ollama server (default, fully private)",
+            "No LLM: retrieval-only mode (chat answers are disabled)"
+          ],
+          "description": "LLM provider for chat, explain and simplify answers. Overrides ~/.codecompass/config.yaml for the daemon process only."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src test --ext .ts",
+    "test": "vitest run",
+    "vendor": "node scripts/vendor.js",
+    "package": "npm run vendor && vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^7.13.0",
+    "@typescript-eslint/parser": "^7.13.0",
+    "@vscode/vsce": "^3.0.0",
+    "eslint": "^8.57.0",
+    "marked": "^18.1.0",
+    "typescript": "^5.5.0",
+    "vis-network": "^10.1.2",
+    "vitest": "^2.1.9"
+  }
+}

@@ -1,0 +1,20 @@
+# NOTE: bump PackageVersion / URLs / SHA256 together with the release tag.
+# The SHA256 value comes from the "codecompass-windows-x64.zip.sha256" file
+# attached to the GitHub Release. Submit updates via PR to microsoft/winget-pkgs.
+PackageIdentifier: CodeCompass.CodeCompass
+PackageVersion: 0.0.1
+PackageName: CodeCompass
+Publisher: CodeCompass
+License: MIT
+ShortDescription: AI-powered codebase intelligence layer
+Installers:
+  - Architecture: x64
+    InstallerType: zip
+    InstallerUrl: https://github.com/codecompass/codecompass/releases/download/v0.0.1/codecompass-windows-x64.zip
+    InstallerSha256: WINDOWS_SHA256_PLACEHOLDER
+    NestedInstallerType: portable
+    NestedInstallerFiles:
+      - RelativeFilePath: codecompass.exe
+        PortableCommandAlias: codecompass
+ManifestType: singleton
+ManifestVersion: 1.6.0
